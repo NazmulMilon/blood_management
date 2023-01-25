@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'systems',
     'blood_app',
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [

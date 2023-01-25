@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class UserProfile(BaseModel):
-    user = models.OneToOneField(User, models.CASCADE, help_text="donor's user name")
+    user = models.ForeignKey(User, models.CASCADE, help_text="donor's user name")
     phone_no = models.CharField(max_length=13, help_text="donor's mobile number")
     blood_group = models.CharField(max_length=10, choices=BloodGroupType.choices(),
                                    default=BloodGroupType.B_POSITIVE.value)
