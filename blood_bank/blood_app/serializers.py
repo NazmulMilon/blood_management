@@ -18,13 +18,15 @@ class UserProfileCreateSerializer(ModelSerializer):
 
 
 class UserProfileListSerializer(ModelSerializer):
-    name = SerializerMethodField()
-    last_name = SerializerMethodField()
-    email = SerializerMethodField()
+    first_name = SerializerMethodField()
 
-    def get_name(self, instance):
-        queryset = User.objects.filter(id=instance.user_id)
-        return UserProfileListSerializer(queryset, many=True).data
+    # last_name = SerializerMethodField()
+    # email = SerializerMethodField()
+    #
+    def get_first_name(self, instance):
+        # return instance.user.first_name if instance.user else None
+        queryset = User.objects.filter(id=instance.user.id)
+        return UserListSerializer(queryset, many=True).data
 
     class Meta:
         model = UserProfile
