@@ -1,17 +1,19 @@
 from django.shortcuts import render
 from .models import UserProfile
-from .serializers import UserProfileCreateSerializer, UserProfileListSerializer, UserListSerializer
+from .serializers import UserProfileCreateSerializer, UserProfileListSerializer, UserListSerializer, \
+    UserProfileRetrieveSerializer, UserRetrieveSerializer, DonorSearchSerializer
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView
+from django.db import transaction
 # Create your views here.
 
 
 class UserProfileCreateAPIView(CreateAPIView):
     serializer_class = UserProfileCreateSerializer
-    queryset = UserProfile.objects.all()
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         data = request.data
         first_name = data.get('first_name', None)
@@ -50,6 +52,17 @@ class UserProfileListAPIView(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserProfileRetrieveAPIView(RetrieveAPIView):
+    serializer_class = UserProfileRetrieveSerializer
+    queryset = UserProfile.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        profile_obj = UserProfile.objects.filter(pk=pk).first()
+        serializer = UserProfileRetrieveSerializer(profile_obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class UserListAPIView(ListAPIView):
     serializer_class = UserListSerializer
     queryset = User.objects.all()
@@ -58,3 +71,58 @@ class UserListAPIView(ListAPIView):
         queryset = User.objects.all()
         serializer = UserListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserRetrieveAPIView(RetrieveAPIView):
+    serializer_class = UserRetrieveSerializer
+    queryset = User.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        user_obj = User.objects.filter(pk=pk).first()
+        serializer = UserRetrieveSerializer(user_obj)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+# class UserProfileSearchAPIView(RetrieveAPIView):
+#     serializer_class = DonorSearchSerializer
+#     queryset = UserProfile.objects.all()
+#
+#     def get(self, request, *args, **kwargs):
+#         value = kwargs.get('value', None)
+#         queryset = UserProfile.objects.filter(blood_group=value) or UserProfile.objects.filter(donation_area=value)
+#         serializer = DonorSearchSerializer(queryset, many=True)
+#         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+#
+# class UserProfileSearchAPIView(RetrieveAPIView):
+#     serializer_class = DonorSearchSerializer
+#     queryset = UserProfile.objects.all()
+#
+#     def get(self, request, *args, **kwargs):
+#         value1 = request.data.get('donation_area', None)
+#         value2 = request.data.get('blood_group', None)
+#         queryset = UserProfile.objects.filter(blood_group=value2) or UserProfile.objects.filter(donation_area=value1)
+#         serializer = DonorSearchSerializer(queryset, many=True)
+#         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class UserProfileSearchAPIView(RetrieveAPIView):
+    serializer_class = DonorSearchSerializer
+    queryset = UserProfile.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        obj = None
+        value = request.data.get('donation_area', None)
+        # value2 = request.data.get('blood_group', None)
+        if UserProfile.objects.filter(phone_no=value).exists():
+            obj = UserProfile.objects.filter(phone_no=value)
+        elif UserProfile.objects.filter(donation_area=value).exists():
+            obj = UserProfile.objects.filter(donation_area=value)
+        elif UserProfile.objects.filter(blood_group=value).exists():
+            obj = UserProfile.objects.filter(blood_group=value)
+        else:
+            return Response(data={'details': 'Donor not found.'}, status=status.HTTP_204_NO_CONTENT)
+
+        serializer = DonorSearchSerializer(obj, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+

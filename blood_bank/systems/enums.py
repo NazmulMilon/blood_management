@@ -26,6 +26,10 @@ class BloodGroupType(BaseEnum):
     A_POSITIVE = 'A+'
     O_POSITIVE = 'O+'
     AB_POSITIVE = 'AB+'
+    B_NEGATIVE = 'B-'
+    A_NEGATIVE = 'A-'
+    O_NEGATIVE = 'O-'
+    AB_NEGATIVE = 'AB-'
 
 
 class UserRole(BaseEnum):

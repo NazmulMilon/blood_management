@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 class UserProfile(BaseModel):
     user = models.ForeignKey(User, models.CASCADE, help_text="donor's user name")
-    phone_no = models.CharField(max_length=13, help_text="donor's mobile number")
+    phone_no = models.IntegerField(help_text="donor's mobile number")
     blood_group = models.CharField(max_length=10, choices=BloodGroupType.choices(),
                                    default=BloodGroupType.B_POSITIVE.value)
     user_type = models.CharField(max_length=50, choices=UserRole.choices(), default=UserRole.DONOR.value)
