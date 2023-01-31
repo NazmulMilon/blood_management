@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView
 from django.db import transaction
 from django.db.models import Q
+from rest_framework.validators import ValidationError
 # Create your views here.
 
 
@@ -137,7 +138,7 @@ class StorageListAPIView(ListAPIView):
     serializer_class = StorageListSerializer
 
     def get(self, request, *args, **kwargs):
-        queryset = Storage.objects.all()
+        queryset = Storage.objects.all().order_by('blood_group')
         serializer = StorageListSerializer(queryset, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -194,3 +195,27 @@ class StorageDecreaseAPIView(UpdateAPIView):
                     storage_obj.save()
         serializer = StorageRetrieveSerializer(storage_obj)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class StorageCreateAPIView(CreateAPIView):
+    serializer_class = StorageRetrieveSerializer
+    queryset = Storage.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        blood_group = data.get('blood_group', None)
+        if blood_group is None:
+            raise ValidationError
+        if Storage.objects.filter(blood_group=blood_group).exists():
+            return Response(data={'details': 'Blood Group is already exists.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        whole_blood = data.get('whole_blood', None)
+        frozen_plasma = data.get('frozen_plasma', None)
+        platelet = data.get('platelet', None)
+
+        blood_obj = Storage(blood_group=blood_group, whole_blood=whole_blood, frozen_plasma=frozen_plasma,
+                            platelet=platelet)
+        blood_obj.save()
+        serializer = self.serializer_class(blood_obj)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+

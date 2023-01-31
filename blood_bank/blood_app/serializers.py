@@ -109,7 +109,7 @@ class DonorSearchSerializer(ModelSerializer):
 class StorageListSerializer(ModelSerializer):
     class Meta:
         model = Storage
-        exclude = ['created_at', 'updated_at']
+        exclude = ['created_at', 'updated_at', 'storage_type']
 
 
 class StorageRetrieveSerializer(ModelSerializer):
