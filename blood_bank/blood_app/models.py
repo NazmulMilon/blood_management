@@ -21,3 +21,15 @@ class UserProfile(BaseModel):
 
     class Meta:
         db_table = 'user_profiles'
+
+
+class Storage(BaseModel):
+    blood_group = models.CharField(max_length=10, choices=BloodGroupType.choices(),
+                                   default=BloodGroupType.B_POSITIVE.value)
+    whole_blood = models.IntegerField(blank=True)
+    frozen_plasma = models.IntegerField(blank=True)
+    platelet = models.IntegerField(blank=True)
+
+    class Meta:
+        db_table = 'storage'
+

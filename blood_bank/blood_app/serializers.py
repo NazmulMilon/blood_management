@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, Storage
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
@@ -20,6 +20,7 @@ class UserProfileCreateSerializer(ModelSerializer):
 class UserProfileListSerializer(ModelSerializer):
     first_name = SerializerMethodField()
     last_name = SerializerMethodField()
+    fullname = SerializerMethodField()
     email = SerializerMethodField()
 
     def get_first_name(self, instance):
@@ -33,6 +34,15 @@ class UserProfileListSerializer(ModelSerializer):
     def get_email(self, instance):
         return instance.user.email if instance.user else None
 
+    def get_fullname(self, instance):
+        name = ""
+        if instance.user.first_name:
+            name += instance.user.first_name + " "
+        if instance.user.last_name:
+            name += instance.user.last_name
+
+        return name
+
     class Meta:
         model = UserProfile
         exclude = ['created_at', 'updated_at']
@@ -43,6 +53,7 @@ class UserProfileRetrieveSerializer(ModelSerializer):
     last_name = SerializerMethodField()
     email = SerializerMethodField()
     username = SerializerMethodField()
+    fullname = SerializerMethodField()
 
     def get_first_name(self, instance):
         return instance.user.first_name if instance.user else None
@@ -57,6 +68,14 @@ class UserProfileRetrieveSerializer(ModelSerializer):
 
     def get_username(self, instance):
         return instance.user.username if instance.user else None
+
+    def get_fullname(self, instance):
+        name = ""
+        if instance.user.first_name:
+            name += instance.user.first_name + " "
+        if instance.user.last_name:
+            name += instance.user.last_name
+        return name
 
     class Meta:
         model = UserProfile
@@ -85,3 +104,9 @@ class DonorSearchSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['username', 'phone_no', 'blood_group', 'donation_area', 'last_donation_date']
+
+
+class StorageListSerializer(ModelSerializer):
+    class Meta:
+        model = Storage
+        exclude = ['created_at', 'updated_at']

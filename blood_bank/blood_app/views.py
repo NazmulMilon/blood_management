@@ -1,12 +1,13 @@
 from django.shortcuts import render
-from .models import UserProfile
+from .models import UserProfile, Storage
 from .serializers import UserProfileCreateSerializer, UserProfileListSerializer, UserListSerializer, \
-    UserProfileRetrieveSerializer, UserRetrieveSerializer, DonorSearchSerializer
+    UserProfileRetrieveSerializer, UserRetrieveSerializer, DonorSearchSerializer, StorageListSerializer
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView
 from django.db import transaction
+from django.db.models import Q
 # Create your views here.
 
 
@@ -84,17 +85,17 @@ class UserRetrieveAPIView(RetrieveAPIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-# class UserProfileSearchAPIView(RetrieveAPIView):
-#     serializer_class = DonorSearchSerializer
-#     queryset = UserProfile.objects.all()
-#
-#     def get(self, request, *args, **kwargs):
-#         value = kwargs.get('value', None)
-#         queryset = UserProfile.objects.filter(blood_group=value) or UserProfile.objects.filter(donation_area=value)
-#         serializer = DonorSearchSerializer(queryset, many=True)
-#         return Response(data=serializer.data, status=status.HTTP_200_OK)
+class UserProfileSearchAPIView(RetrieveAPIView):
+    serializer_class = DonorSearchSerializer
+    queryset = UserProfile.objects.all()
 
-#
+    def get(self, request, *args, **kwargs):
+        value = kwargs.get('value', None)
+        queryset = UserProfile.objects.filter(Q(blood_group=value) | Q(donation_area=value))
+        serializer = DonorSearchSerializer(queryset, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
 # class UserProfileSearchAPIView(RetrieveAPIView):
 #     serializer_class = DonorSearchSerializer
 #     queryset = UserProfile.objects.all()
@@ -105,24 +106,36 @@ class UserRetrieveAPIView(RetrieveAPIView):
 #         queryset = UserProfile.objects.filter(blood_group=value2) or UserProfile.objects.filter(donation_area=value1)
 #         serializer = DonorSearchSerializer(queryset, many=True)
 #         return Response(data=serializer.data, status=status.HTTP_200_OK)
+#
 
-class UserProfileSearchAPIView(RetrieveAPIView):
-    serializer_class = DonorSearchSerializer
-    queryset = UserProfile.objects.all()
+# class UserProfileSearchAPIView(RetrieveAPIView):
+#     serializer_class = DonorSearchSerializer
+#     queryset = UserProfile.objects.all()
+
+    # def get(self, request, *args, **kwargs):
+    #     obj = None
+    #     value = kwargs.get('value', None)
+    #     # value2 = request.data.get('blood_group', None)
+    #
+    #     if UserProfile.objects.filter(phone_no=value).exists():
+    #         obj = UserProfile.objects.filter(phone_no=value)
+    #     elif UserProfile.objects.filter(donation_area=value).exists():
+    #         obj = UserProfile.objects.filter(donation_area=value)
+    #     elif UserProfile.objects.filter(blood_group=value).exists():
+    #         obj = UserProfile.objects.filter(blood_group=value)
+    #     else:
+    #         return Response(data={'details': 'Donor not found.'}, status=status.HTTP_204_NO_CONTENT)
+    #
+    #     serializer = DonorSearchSerializer(obj, many=True)
+    #     return Response(data=serializer.data, status=status.HTTP_200_OK)
+    #
+
+
+class StorageListAPIView(ListAPIView):
+    queryset = Storage.objects.all()
+    serializer_class = StorageListSerializer
 
     def get(self, request, *args, **kwargs):
-        obj = None
-        value = request.data.get('donation_area', None)
-        # value2 = request.data.get('blood_group', None)
-        if UserProfile.objects.filter(phone_no=value).exists():
-            obj = UserProfile.objects.filter(phone_no=value)
-        elif UserProfile.objects.filter(donation_area=value).exists():
-            obj = UserProfile.objects.filter(donation_area=value)
-        elif UserProfile.objects.filter(blood_group=value).exists():
-            obj = UserProfile.objects.filter(blood_group=value)
-        else:
-            return Response(data={'details': 'Donor not found.'}, status=status.HTTP_204_NO_CONTENT)
-
-        serializer = DonorSearchSerializer(obj, many=True)
+        queryset = Storage.objects.all()
+        serializer = StorageListSerializer(queryset, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
-
