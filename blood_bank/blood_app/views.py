@@ -151,3 +151,46 @@ class StorageRetrieveAPIView(RetrieveAPIView):
         storage_obj = Storage.objects.filter(blood_group=value).first()
         serializer = self.serializer_class(storage_obj)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class StorageDecreaseAPIView(UpdateAPIView):
+    serializer_class = StorageRetrieveSerializer
+    queryset = Storage.objects.all()
+
+    def put(self, request, *args, **kwargs):
+        value = kwargs.get('value', None)
+        storage_obj = Storage.objects.filter(blood_group=value).first()
+        data = request.data
+        add_remove = data['add_remove']
+        whole_blood = data.get('whole_blood', None)
+        frozen_plasma = data.get('frozen_plasma', None)
+        platelet = data.get('platelet', None)
+
+        if add_remove == "-":
+            if whole_blood is not None:
+                if storage_obj.whole_blood >= whole_blood:
+                    storage_obj.whole_blood -= whole_blood
+                    storage_obj.save()
+            if frozen_plasma is not None:
+                if storage_obj.frozen_plasma >= frozen_plasma:
+                    storage_obj.frozen_plasma -= frozen_plasma
+                    storage_obj.save()
+            if platelet is not None:
+                if storage_obj.platelet >= platelet:
+                    storage_obj.platelet -= platelet
+                    storage_obj.save()
+        elif add_remove == "+":
+            if whole_blood is not None:
+                if storage_obj.whole_blood >= 0:
+                    storage_obj.whole_blood += whole_blood
+                    storage_obj.save()
+            if frozen_plasma is not None:
+                if storage_obj.frozen_plasma >= 0:
+                    storage_obj.frozen_plasma += frozen_plasma
+                    storage_obj.save()
+            if platelet is not None:
+                if storage_obj.platelet >= 0:
+                    storage_obj.platelet += platelet
+                    storage_obj.save()
+        serializer = StorageRetrieveSerializer(storage_obj)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
