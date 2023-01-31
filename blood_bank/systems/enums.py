@@ -41,3 +41,8 @@ class UserRole(BaseEnum):
 class GenderType(BaseEnum):
     MALE = 'MALE'
     FEMALE = 'FEMALE'
+
+
+class StorageType(BaseEnum):
+    STORAGE_INCREASE = "DONATE"
+    STORAGE_TAKE = "TAKE"

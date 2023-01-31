@@ -1,7 +1,7 @@
 
 from django.db import models
 from systems.models import BaseModel
-from systems.enums import BloodGroupType, UserRole, GenderType
+from systems.enums import BloodGroupType, UserRole, GenderType, StorageType
 from django.contrib.auth.models import User
 
 
@@ -29,6 +29,7 @@ class Storage(BaseModel):
     whole_blood = models.IntegerField(blank=True)
     frozen_plasma = models.IntegerField(blank=True)
     platelet = models.IntegerField(blank=True)
+    storage_type = models.CharField(max_length=20, choices=StorageType.choices(), default=StorageType.STORAGE_INCREASE.value)
 
     class Meta:
         db_table = 'storage'

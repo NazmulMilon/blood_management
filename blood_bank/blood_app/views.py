@@ -161,12 +161,12 @@ class StorageDecreaseAPIView(UpdateAPIView):
         value = kwargs.get('value', None)
         storage_obj = Storage.objects.filter(blood_group=value).first()
         data = request.data
-        add_remove = data['add_remove']
+        storage_type = data.get('storage_type')
         whole_blood = data.get('whole_blood', None)
         frozen_plasma = data.get('frozen_plasma', None)
         platelet = data.get('platelet', None)
 
-        if add_remove == "-":
+        if storage_type == "TAKE":
             if whole_blood is not None:
                 if storage_obj.whole_blood >= whole_blood:
                     storage_obj.whole_blood -= whole_blood
@@ -179,7 +179,7 @@ class StorageDecreaseAPIView(UpdateAPIView):
                 if storage_obj.platelet >= platelet:
                     storage_obj.platelet -= platelet
                     storage_obj.save()
-        elif add_remove == "+":
+        elif storage_type == "DONATE":
             if whole_blood is not None:
                 if storage_obj.whole_blood >= 0:
                     storage_obj.whole_blood += whole_blood
