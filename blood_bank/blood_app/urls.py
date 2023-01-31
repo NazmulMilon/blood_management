@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import UserProfileCreateAPIView, UserProfileListAPIView, UserListAPIView, UserProfileRetrieveAPIView, \
-    UserRetrieveAPIView, UserProfileSearchAPIView, StorageListAPIView
+    UserRetrieveAPIView, UserProfileSearchAPIView, StorageListAPIView, StorageRetrieveAPIView
 urlpatterns = [
     path('profile/create/', UserProfileCreateAPIView.as_view(), name='user_create'),
     path('profile/list/all/', UserProfileListAPIView.as_view(), name='user_create'),
@@ -15,5 +15,6 @@ urlpatterns = [
 
     # blood storage
     path('storage/all/', StorageListAPIView.as_view(), name='all blood storage'),
+    path('storage/retrieve/<str:value>/', StorageRetrieveAPIView.as_view(), name='all blood storage'),
 
 ]

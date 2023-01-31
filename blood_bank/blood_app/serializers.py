@@ -110,3 +110,9 @@ class StorageListSerializer(ModelSerializer):
     class Meta:
         model = Storage
         exclude = ['created_at', 'updated_at']
+
+
+class StorageRetrieveSerializer(ModelSerializer):
+    class Meta:
+        model = Storage
+        exclude = ['created_at', 'updated_at']

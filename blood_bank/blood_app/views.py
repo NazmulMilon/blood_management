@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import UserProfile, Storage
 from .serializers import UserProfileCreateSerializer, UserProfileListSerializer, UserListSerializer, \
-    UserProfileRetrieveSerializer, UserRetrieveSerializer, DonorSearchSerializer, StorageListSerializer
+    UserProfileRetrieveSerializer, UserRetrieveSerializer, DonorSearchSerializer, StorageListSerializer, \
+    StorageRetrieveSerializer
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import status
@@ -138,4 +139,15 @@ class StorageListAPIView(ListAPIView):
     def get(self, request, *args, **kwargs):
         queryset = Storage.objects.all()
         serializer = StorageListSerializer(queryset, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class StorageRetrieveAPIView(RetrieveAPIView):
+    serializer_class = StorageRetrieveSerializer
+    queryset = Storage.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        value = kwargs.get('value', None)
+        storage_obj = Storage.objects.filter(blood_group=value).first()
+        serializer = self.serializer_class(storage_obj)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
