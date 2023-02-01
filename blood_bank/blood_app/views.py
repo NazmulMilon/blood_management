@@ -10,6 +10,9 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, R
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.validators import ValidationError
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # Create your views here.
 
 
@@ -17,6 +20,7 @@ class UserProfileCreateAPIView(CreateAPIView):
     serializer_class = UserProfileCreateSerializer
 
     @transaction.atomic
+    @swagger_auto_schema(tags=['User Profile'])
     def post(self, request, *args, **kwargs):
         data = request.data
         first_name = data.get('first_name', None)
@@ -48,7 +52,9 @@ class UserProfileCreateAPIView(CreateAPIView):
 class UserProfileListAPIView(ListAPIView):
     serializer_class = UserProfileListSerializer
     queryset = UserProfile.objects.all()
+    permission_classes = [IsAuthenticated, ]
 
+    @swagger_auto_schema(tags=["User Profile"])
     def get(self, request, *args, **kwargs):
         queryset = UserProfile.objects.all()
         serializer = UserProfileListSerializer(queryset, many=True)
@@ -58,7 +64,9 @@ class UserProfileListAPIView(ListAPIView):
 class UserProfileRetrieveAPIView(RetrieveAPIView):
     serializer_class = UserProfileRetrieveSerializer
     queryset = UserProfile.objects.all()
+    permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(tags=["User Profile"])
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk', None)
         profile_obj = UserProfile.objects.filter(pk=pk).first()
@@ -69,7 +77,9 @@ class UserProfileRetrieveAPIView(RetrieveAPIView):
 class UserListAPIView(ListAPIView):
     serializer_class = UserListSerializer
     queryset = User.objects.all()
+    permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(tags=["User"])
     def get(self, request, *args, **kwargs):
         queryset = User.objects.all()
         serializer = UserListSerializer(queryset, many=True)
@@ -79,7 +89,9 @@ class UserListAPIView(ListAPIView):
 class UserRetrieveAPIView(RetrieveAPIView):
     serializer_class = UserRetrieveSerializer
     queryset = User.objects.all()
+    permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(tags=["User"])
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         user_obj = User.objects.filter(pk=pk).first()
@@ -90,7 +102,9 @@ class UserRetrieveAPIView(RetrieveAPIView):
 class UserProfileSearchAPIView(RetrieveAPIView):
     serializer_class = DonorSearchSerializer
     queryset = UserProfile.objects.all()
+    permission_classes = [AllowAny, ]
 
+    @swagger_auto_schema(tags=["User Profile"])
     def get(self, request, *args, **kwargs):
         value = kwargs.get('value', None)
         queryset = UserProfile.objects.filter(Q(blood_group=value) | Q(donation_area=value))
@@ -137,6 +151,7 @@ class StorageListAPIView(ListAPIView):
     queryset = Storage.objects.all()
     serializer_class = StorageListSerializer
 
+    @swagger_auto_schema(tags=["Storage"])
     def get(self, request, *args, **kwargs):
         queryset = Storage.objects.all().order_by('blood_group')
         serializer = StorageListSerializer(queryset, many=True)
@@ -147,6 +162,7 @@ class StorageRetrieveAPIView(RetrieveAPIView):
     serializer_class = StorageRetrieveSerializer
     queryset = Storage.objects.all()
 
+    @swagger_auto_schema(tags=["Storage"])
     def get(self, request, *args, **kwargs):
         value = kwargs.get('value', None)
         storage_obj = Storage.objects.filter(blood_group=value).first()
@@ -158,6 +174,7 @@ class StorageDecreaseAPIView(UpdateAPIView):
     serializer_class = StorageRetrieveSerializer
     queryset = Storage.objects.all()
 
+    @swagger_auto_schema(tags=["Storage"])
     def put(self, request, *args, **kwargs):
         value = kwargs.get('value', None)
         storage_obj = Storage.objects.filter(blood_group=value).first()
@@ -201,6 +218,7 @@ class StorageCreateAPIView(CreateAPIView):
     serializer_class = StorageRetrieveSerializer
     queryset = Storage.objects.all()
 
+    @swagger_auto_schema(tags=["Storage"])
     def post(self, request, *args, **kwargs):
         data = request.data
         blood_group = data.get('blood_group', None)
