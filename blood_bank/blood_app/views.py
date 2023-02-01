@@ -56,7 +56,7 @@ class UserProfileListAPIView(ListAPIView):
 
     @swagger_auto_schema(tags=["User Profile"])
     def get(self, request, *args, **kwargs):
-        queryset = UserProfile.objects.all()
+        queryset = UserProfile.objects.all().order_by('blood_group')
         serializer = UserProfileListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

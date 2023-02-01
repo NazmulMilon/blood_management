@@ -97,13 +97,22 @@ class UserRetrieveSerializer(ModelSerializer):
 
 class DonorSearchSerializer(ModelSerializer):
     username = SerializerMethodField()
+    fullname = SerializerMethodField()
 
     def get_username(self, instance):
         return instance.user.username if instance.user else None
 
+    def get_fullname(self, instance):
+        name = ""
+        if instance.user.first_name:
+            name += instance.user.first_name + " "
+        if instance.user.last_name:
+            name += instance.user.last_name
+        return name
+
     class Meta:
         model = UserProfile
-        fields = ['username', 'phone_no', 'blood_group', 'donation_area', 'last_donation_date']
+        fields = ['username', 'fullname', 'phone_no', 'blood_group', 'donation_area', 'last_donation_date']
 
 
 class StorageListSerializer(ModelSerializer):
